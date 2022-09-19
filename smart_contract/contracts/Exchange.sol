@@ -11,4 +11,8 @@ contract Exchange is ERC20 {
         require(_CryptoDevtoken != address(0), "Token address passed is a null address");
         cryptoDevTokenAddress = _CryptoDevtoken;
     }
+
+    function getReserve() public view returns (uint) {
+        return ERC20(cryptoDevTokenAddress).balanceOf(address(this));
+    }
 }
