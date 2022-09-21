@@ -77,4 +77,6 @@ contract Exchange is ERC20 {
         }
         return liquidity;
     }
+
+    function removeLiquidity()
 }
