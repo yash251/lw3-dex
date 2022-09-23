@@ -108,4 +108,5 @@ contract Exchange is ERC20 {
         ERC20(cryptoDevTokenAddress).transfer(msg.sender, cryptoDevTokenAmount);
         return (ethAmount, cryptoDevTokenAmount);
     }
+    function getAmountOfTokens()
 }
