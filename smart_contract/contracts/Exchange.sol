@@ -18,9 +18,11 @@ contract Exchange is ERC20 {
         return ERC20(cryptoDevTokenAddress).balanceOf(address(this));
     }
 
+    // ETH Reserve = address(this).balance
+
     function addLiquidity(uint256 _amount) public payable returns (uint256) {
         uint256 liquidity;
-        uint256 ethReserve = address(this).balance;
+        uint256 ethBalance = address(this).balance;
         uint256 cryptoDevTokenReserve = getReserve();
         ERC20 cryptoDevToken = ERC20(cryptoDevTokenAddress);
         /*
@@ -30,14 +32,12 @@ contract Exchange is ERC20 {
         if (cryptoDevTokenReserve == 0) {
             // Transfer the `cryptoDevToken` from the user's account to the contract
             cryptoDevToken.transferFrom(msg.sender, address(this), _amount);
-            /* 
-                Take the current ethBalance and mint `ethBalance` amount of LP tokens to the user.
-                `liquidity` provided is equal to `ethBalance` because this is the first time user
-                is adding `Eth` to the contract, so whatever `Eth` contract has is equal to the one supplied
-                by the user in the current `addLiquidity` call
-                `liquidity` tokens that need to be minted to the user on `addLiquidity` call should always be proportional
-                to the Eth specified by the user
-            */
+            // Take the current ethBalance and mint `ethBalance` amount of LP tokens to the user.
+            // `liquidity` provided is equal to `ethBalance` because this is the first time user
+            // is adding `Eth` to the contract, so whatever `Eth` contract has is equal to the one supplied
+            // by the user in the current `addLiquidity` call
+            // `liquidity` tokens that need to be minted to the user on `addLiquidity` call should always be proportional
+            // to the Eth specified by the user
             liquidity = ethBalance;
             _mint(msg.sender, liquidity);
             // _mint is ERC20.sol smart contract function to mint ERC20 tokens
@@ -67,7 +67,7 @@ contract Exchange is ERC20 {
                 address(this),
                 cryptoDevTokenAmount
             );
-            // The amount of LP tokens that would be sent to the user should be propotional to the liquidity of
+            // The amount of LP tokens that would be sent to the user should be proportional to the liquidity of
             // ether added by the user
             // Ratio here to be maintained is ->
             // (LP tokens to be sent to the user (liquidity)/ totalSupply of LP tokens in contract) = (Eth sent by the user)/(Eth reserve in the contract)
@@ -102,9 +102,9 @@ contract Exchange is ERC20 {
         // Burn the sent LP tokens from the user's wallet because they are already sent to
         // remove liquidity
         _burn(msg.sender, _amount);
-        // Transfer `ethAmount` of Eth from user's wallet to the contract
+        // Transfer `ethAmount` of Eth from the contract to the user's wallet
         payable(msg.sender).transfer(ethAmount);
-        // Transfer `cryptoDevTokenAmount` of Crypto Dev tokens from the user's wallet to the contract
+        // Transfer `cryptoDevTokenAmount` of Crypto Dev tokens from the contract to the user's wallet
         ERC20(cryptoDevTokenAddress).transfer(msg.sender, cryptoDevTokenAmount);
         return (ethAmount, cryptoDevTokenAmount);
     }
@@ -127,5 +127,17 @@ contract Exchange is ERC20 {
         uint256 numerator = inputAmountWithFee * outputReserve;
         uint256 denominator = (inputReserve * 100) + inputAmountWithFee;
         return numerator / denominator;
+    }
+
+    function ethToCryptoDevToken(uint256 _minTokens) public payable {
+        uint256 tokenReserve = getReserve();
+        uint256 tokensBought = getAmountOfTokens(
+            msg.value,
+            address(this).balance - msg.value,
+            tokenReserve
+        );
+
+        require(tokensBought >= _minTokens, "insufficient output amount");
+        ERC20(cryptoDevTokenAddress).transfer(smg.sender, tokensBought);
     }
 }
