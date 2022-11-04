@@ -62,4 +62,23 @@ export const getLPTokensBalance = async (provider, address) => {
     catch (err) {
         console.error(err);
     }
-  };
+};
+
+/**
+ * getReserveOfCDTokens: Retrieves the amount of CD tokens in the
+ * exchange contract address
+ */
+ export const getReserveOfCDTokens = async (provider) => {
+    try {
+        const exchangeContract = new Contract(
+            EXCHANGE_CONTRACT_ADDRESS,
+            EXCHANGE_CONTRACT_ABI,
+            provider
+        );
+        const reserve = await exchangeContract.getReserve();
+        return reserve;
+    }
+    catch (err) {
+        console.error(err);
+    }
+};
