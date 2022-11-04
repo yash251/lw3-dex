@@ -32,14 +32,34 @@ export const getEtherBalance = async (provider, address, contract = false) => {
  */
  export const getCDTokensBalance = async (provider, address) => {
     try {
-      const tokenContract = new Contract(
-        TOKEN_CONTRACT_ADDRESS,
-        TOKEN_CONTRACT_ABI,
-        provider
-      );
-      const balanceOfCryptoDevTokens = await tokenContract.balanceOf(address);
-      return balanceOfCryptoDevTokens;
-    } catch (err) {
-      console.error(err);
+        const tokenContract = new Contract(
+            TOKEN_CONTRACT_ADDRESS,
+            TOKEN_CONTRACT_ABI,
+            provider
+        );
+        const balanceOfCryptoDevTokens = await tokenContract.balanceOf(address);
+        return balanceOfCryptoDevTokens;
+    }
+    catch (err) {
+        console.error(err);
+    }
+ };
+
+ /**
+ * getLPTokensBalance: Retrieves the amount of LP tokens in the account
+ * of the provided `address`
+ */
+export const getLPTokensBalance = async (provider, address) => {
+    try {
+        const exchangeContract = new Contract(
+            EXCHANGE_CONTRACT_ADDRESS,
+            EXCHANGE_CONTRACT_ABI,
+            provider
+        );
+        const balanceOfLPTokens = await exchangeContract.balanceOf(address);
+        return balanceOfLPTokens;
+    }
+    catch (err) {
+        console.error(err);
     }
   };
