@@ -25,3 +25,21 @@ export const getEtherBalance = async (provider, address, contract = false) => {
         return 0;
     }
 };
+
+/**
+ * getCDTokensBalance: Retrieves the Crypto Dev tokens in the account
+ * of the provided `address`
+ */
+ export const getCDTokensBalance = async (provider, address) => {
+    try {
+      const tokenContract = new Contract(
+        TOKEN_CONTRACT_ADDRESS,
+        TOKEN_CONTRACT_ABI,
+        provider
+      );
+      const balanceOfCryptoDevTokens = await tokenContract.balanceOf(address);
+      return balanceOfCryptoDevTokens;
+    } catch (err) {
+      console.error(err);
+    }
+  };
